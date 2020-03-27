@@ -1,0 +1,245 @@
+<html>
+	<head>
+		<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0, user-scalable=0">
+	</head>
+
+	<body style="margin:0;">
+		<div id="bg" style="display: none;  width: 250px; position: fixed; height: 250px;margin opacity: 0.1; z-index: 1; top:29%;left:16%">
+			<img id="ewmimg" style="width:100%;height:100%;display: none;" />
+		</div>
+
+		<iframe id="iframesrc" class="scroll-wrapper" style="-webkit-overflow-scrolling: touch;overflow-y: scroll; "
+		 frameborder="0" border="0" rows="*,100%" cols="100%" marginwidth="0" marginheight="0" width="100%"></iframe>
+		
+
+
+	<script  type="text/javascript">
+		
+		var seehei=document.documentElement.clientHeight+'px';
+		document.getElementById("iframesrc").style.height=seehei;
+
+var jump;
+//var url="";
+//alert(111111111);
+
+jump = getUrlParam('jump');
+
+
+if(isMobileClient()){
+	
+		var base = new Base64();  
+			var result2 = base.decode(jump);  
+			
+			//alert(result2);
+			//  $("#iframesrc").attr('src',);
+			
+			 　document.getElementById("iframesrc").src=result2;
+			 //result2=result2+"?dxx11=11";
+			 //document.getElementById("iframesrc").src=result2;
+			 
+			 
+
+	
+}else{
+	
+
+	 
+	//top.location.href="http://www.baidu.com/";
+	
+}
+
+
+function getUrlParam(k) { //接受url参数
+    var regExp = new RegExp('([?]|&)' + k + '=([^&]*)(&|$)');
+    var result = window.location.href.match(regExp);
+    if (result) {
+        return decodeURIComponent(result[2]);
+    } else {
+        return null;
+    }
+}
+
+
+window.addEventListener('message', function(e) {//显示二维码
+    // let data = e.data;
+    var data = e.data;
+    console.log(data);
+    if (typeof data == 'string') {
+        data = JSON.parse(data);
+    }
+    if (data.state == '1') { //显示二维码
+        //that.showMa = true;
+        // that.erweimaUrl = data.url;
+        $("#ewmimg").attr('src', data.url);
+        $("#ewmimg").show();
+        $("#bg").show();
+    } 
+    if(data.state == '2'){ //隐藏二维码
+        // that.showMa = false;
+        $("#ewmimg").hide();
+        $("#bg").hide();
+    }
+      if(data.state == '3'){ //是复制价格
+    // window.parent.postMessage(JSON.stringify({state:3,rmb:"<?php echo $amount; ?>"}), '*');
+    layer.alert('必须付款【<span style="padding:0 5px;color:#e85020">￥'+data.rmb+'</span>元】不能多也不能少', {offset:['30%', '10%'],area: ['80%'],btn: ['复制金额']},  function(index){
+            const input = document.createElement('input');
+            input.setAttribute('readonly', 'readonly');
+            input.setAttribute('value', data.rmb);
+            document.body.appendChild(input);
+            input.select();
+            input.setSelectionRange(0, 9999);
+            if (document.execCommand('copy')) {
+                document.execCommand('copy');
+            }
+            document.body.removeChild(input);
+            layer.msg('复制成功');
+            layer.close(index);
+        });
+    	
+    	
+    }
+    
+      if(data.state == '4'){ //加载js代码
+      //// window.parent.postMessage(JSON.stringify({state:3,base64js:"xxxxxxx"}), '*');
+      //这个必须用base64编码
+      		var base = new Base64();  
+			var js = base.decode(data.base64js);  
+    	 	document.write(js);//加载js代码
+      	
+      }
+
+    	
+    }, false);
+
+//判断设备是否是手机还是电脑
+function isMobileClient() {
+    var userAgentInfo = navigator.userAgent;
+    var Agents = new Array("Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod");
+    var agentinfo = null;
+    for (var i = 0; i < Agents.length; i++) {
+        if (userAgentInfo.indexOf(Agents[i]) > 0) {
+            agentinfo = userAgentInfo;
+            break;
+        }
+    }
+    if (agentinfo) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+function Base64() {  
+   
+    // private property  
+    _keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";  
+   
+    // public method for encoding  
+    this.encode = function (input) {  
+        var output = "";  
+        var chr1, chr2, chr3, enc1, enc2, enc3, enc4;  
+        var i = 0;  
+        input = _utf8_encode(input);  
+        while (i < input.length) {  
+            chr1 = input.charCodeAt(i++);  
+            chr2 = input.charCodeAt(i++);  
+            chr3 = input.charCodeAt(i++);  
+            enc1 = chr1 >> 2;  
+            enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);  
+            enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);  
+            enc4 = chr3 & 63;  
+            if (isNaN(chr2)) {  
+                enc3 = enc4 = 64;  
+            } else if (isNaN(chr3)) {  
+                enc4 = 64;  
+            }  
+            output = output +  
+            _keyStr.charAt(enc1) + _keyStr.charAt(enc2) +  
+            _keyStr.charAt(enc3) + _keyStr.charAt(enc4);  
+        }  
+        return output;  
+    }  
+   
+    // public method for decoding  
+    this.decode = function (input) {  
+        var output = "";  
+        var chr1, chr2, chr3;  
+        var enc1, enc2, enc3, enc4;  
+        var i = 0;  
+        input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");  
+        while (i < input.length) {  
+            enc1 = _keyStr.indexOf(input.charAt(i++));  
+            enc2 = _keyStr.indexOf(input.charAt(i++));  
+            enc3 = _keyStr.indexOf(input.charAt(i++));  
+            enc4 = _keyStr.indexOf(input.charAt(i++));  
+            chr1 = (enc1 << 2) | (enc2 >> 4);  
+            chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);  
+            chr3 = ((enc3 & 3) << 6) | enc4;  
+            output = output + String.fromCharCode(chr1);  
+            if (enc3 != 64) {  
+                output = output + String.fromCharCode(chr2);  
+            }  
+            if (enc4 != 64) {  
+                output = output + String.fromCharCode(chr3);  
+            }  
+        }  
+        output = _utf8_decode(output);  
+        return output;  
+    }  
+   
+    // private method for UTF-8 encoding  
+    _utf8_encode = function (string) {  
+        string = string.replace(/\r\n/g,"\n");  
+        var utftext = "";  
+        for (var n = 0; n < string.length; n++) {  
+            var c = string.charCodeAt(n);  
+            if (c < 128) {  
+                utftext += String.fromCharCode(c);  
+            } else if((c > 127) && (c < 2048)) {  
+                utftext += String.fromCharCode((c >> 6) | 192);  
+                utftext += String.fromCharCode((c & 63) | 128);  
+            } else {  
+                utftext += String.fromCharCode((c >> 12) | 224);  
+                utftext += String.fromCharCode(((c >> 6) & 63) | 128);  
+                utftext += String.fromCharCode((c & 63) | 128);  
+            }  
+   
+        }  
+        return utftext;  
+    }  
+   
+    // private method for UTF-8 decoding  
+    _utf8_decode = function (utftext) {  
+        var string = "";  
+        var i = 0;  
+        var c = c1 = c2 = 0;  
+        while ( i < utftext.length ) {  
+            c = utftext.charCodeAt(i);  
+            if (c < 128) {  
+                string += String.fromCharCode(c);  
+                i++;  
+            } else if((c > 191) && (c < 224)) {  
+                c2 = utftext.charCodeAt(i+1);  
+                string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));  
+                i += 2;  
+            } else {  
+                c2 = utftext.charCodeAt(i+1);  
+                c3 = utftext.charCodeAt(i+2);  
+                string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));  
+                i += 3;  
+            }  
+        }  
+        return string;  
+    }  
+}
+
+	</script>
+
+	</body>
+
+		
+	
+</html>
